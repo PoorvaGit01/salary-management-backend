@@ -115,9 +115,9 @@ class EmployeeTest < ActiveSupport::TestCase
     assert_not employee.valid?
     assert employee.errors[:employee_number].any?
 
-    employee = Employee.new(valid_attributes.merge(employee_number: "A" * 65))
+    employee = Employee.new(valid_attributes.merge(employee_number: "A" * (Employee::MAX_EMPLOYEE_NUMBER_LENGTH + 1)))
     assert_not employee.valid?
-    assert_includes employee.errors[:employee_number], "is too long (maximum is 64 characters)"
+    assert_includes employee.errors[:employee_number], "is too long (maximum is #{Employee::MAX_EMPLOYEE_NUMBER_LENGTH} characters)"
   end
 
   test "employee_number must be unique when present" do
