@@ -1,0 +1,24 @@
+alice:
+  first_name: Alice
+  last_name: Anderson
+  job_title: Software Engineer
+  country: US
+  salary: 120_000.00
+  currency: USD
+  email: alice@example.com
+  department: Engineering
+  hired_on: 2022-01-10
+  employment_status: 0
+  employee_number: ENG-001
+
+bob:
+  first_name: Bob
+  last_name: Brown
+  job_title: Product Manager
+  country: GB
+  salary: 95_000.00
+  currency: GBP
+  department: Product
+  hired_on: 2023-06-01
+  employment_status: 0
+  employee_number: PRD-002
