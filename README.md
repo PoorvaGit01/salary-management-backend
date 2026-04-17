@@ -50,7 +50,7 @@ Create databases, run migrations, and seed (if applicable):
 ```bash
 bin/rails db:create
 bin/rails db:migrate
-# optional: bin/rails db:seed
+bin/rails db:seed
 ```
 
 Or use the setup script (installs gems, prepares the DB, starts the dev server):
@@ -64,6 +64,22 @@ Run the test suite after preparing the test database:
 ```bash
 RAILS_ENV=test bin/rails db:test:prepare test
 ```
+
+## Database seeding
+
+The default seed loads **10,000 synthetic employees** for local development and load testing.
+
+- **Names** — Each row’s first and last name are chosen **independently** by sampling from [`db/data/first_names.txt`](db/data/first_names.txt) and [`db/data/last_names.txt`](db/data/last_names.txt).
+- **Performance** — Seeds use **`insert_all!` in batches** (2,000 rows per insert) after a single `DELETE`, so engineers can re-run `db:seed` often without waiting on per-record creates or validations.
+- **Reproducible randomness** — Optional: set `SEED_RANDOM` to a fixed integer so job titles, departments, salaries, and name draws repeat across runs:
+
+  ```bash
+  SEED_RANDOM=42 bin/rails db:seed
+  ```
+
+- **Production** — `EmployeesBulkSeed` **does not run in `RAILS_ENV=production`**. It would replace every employee row, so it is skipped there with a warning.
+
+Implementation lives in [`db/seeds/employees_bulk_seed.rb`](db/seeds/employees_bulk_seed.rb) and is invoked from [`db/seeds.rb`](db/seeds.rb).
 
 ## Other topics
 
