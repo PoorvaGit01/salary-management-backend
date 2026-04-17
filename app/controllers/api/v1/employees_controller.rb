@@ -1,11 +1,28 @@
 module Api
   module V1
     class EmployeesController < Api::ApplicationController
+      MAX_PER_PAGE = 100
+      DEFAULT_PER_PAGE = 25
+
       before_action :set_employee, only: %i[show update destroy]
 
       def index
-        employees = Employee.order(:last_name, :first_name)
-        render json: employees.map { |employee| employee_json(employee) }
+        scope = Employee.order(:last_name, :first_name)
+        scope = apply_search_filter(scope, params[:q])
+        page, per_page = pagination_params
+        total_count = scope.count
+        records = scope.offset((page - 1) * per_page).limit(per_page)
+        total_pages = total_count.zero? ? 0 : (total_count.to_f / per_page).ceil
+
+        render json: {
+          employees: records.map { |employee| employee_json(employee) },
+          meta: {
+            page: page,
+            per_page: per_page,
+            total_count: total_count,
+            total_pages: total_pages
+          }
+        }
       end
 
       def show
@@ -35,6 +52,32 @@ module Api
       end
 
       private
+
+      def pagination_params
+        page = [ params[:page].to_i, 1 ].max
+        requested = params[:per_page].to_i
+        per_page = requested.positive? ? requested : DEFAULT_PER_PAGE
+        per_page = [ per_page, MAX_PER_PAGE ].min
+        [ page, per_page ]
+      end
+
+      def apply_search_filter(relation, q)
+        q = q.to_s.strip
+        return relation if q.blank?
+
+        term = "%#{ActiveRecord::Base.sanitize_sql_like(q)}%"
+        relation.where(
+          <<~SQL.squish,
+            employees.first_name ILIKE :term
+            OR employees.last_name ILIKE :term
+            OR employees.email ILIKE :term
+            OR employees.job_title ILIKE :term
+            OR COALESCE(employees.department, '') ILIKE :term
+            OR COALESCE(employees.employee_number, '') ILIKE :term
+          SQL
+          term: term
+        )
+      end
 
       def set_employee
         @employee = Employee.find(params[:id])

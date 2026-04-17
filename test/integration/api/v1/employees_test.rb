@@ -7,15 +7,45 @@ module Api
         @employee = employees(:alice)
       end
 
-      test "GET index returns employees as JSON with full_name" do
+      test "GET index returns employees as JSON with full_name and meta" do
         get api_v1_employees_path, as: :json
         assert_response :success
-        list = JSON.parse(response.body)
-        assert_kind_of Array, list
-        record = list.find { |row| row["id"] == @employee.id }
+        body = JSON.parse(response.body)
+        assert_kind_of Array, body["employees"]
+        assert_kind_of Hash, body["meta"]
+        assert_equal 2, body["meta"]["total_count"]
+        assert_equal 1, body["meta"]["page"]
+        assert_equal 25, body["meta"]["per_page"]
+        record = body["employees"].find { |row| row["id"] == @employee.id }
         assert_equal "Alice", record["first_name"]
         assert_equal "Anderson", record["last_name"]
         assert_equal "Alice Anderson", record["full_name"]
+      end
+
+      test "GET index paginates" do
+        get api_v1_employees_path, params: { page: 1, per_page: 1 }, as: :json
+        assert_response :success
+        body = JSON.parse(response.body)
+        assert_equal 1, body["employees"].size
+        assert_equal 2, body["meta"]["total_count"]
+        assert_equal 2, body["meta"]["total_pages"]
+      end
+
+      test "GET index filters by search query" do
+        get api_v1_employees_path, params: { q: "alice@example.com" }, as: :json
+        assert_response :success
+        body = JSON.parse(response.body)
+        assert_equal 1, body["employees"].size
+        assert_equal "Alice", body["employees"].first["first_name"]
+        assert_equal 1, body["meta"]["total_count"]
+      end
+
+      test "GET index search matches job title" do
+        get api_v1_employees_path, params: { q: "Product Manager" }, as: :json
+        assert_response :success
+        body = JSON.parse(response.body)
+        assert_equal 1, body["employees"].size
+        assert_equal "Bob", body["employees"].first["first_name"]
       end
 
       test "GET show returns one employee" do
