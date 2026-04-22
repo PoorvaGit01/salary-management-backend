@@ -83,6 +83,7 @@ Implementation lives in [`db/seeds/employees_bulk_seed.rb`](db/seeds/employees_b
 
 ## Other topics
 
+* **Design decisions** — see [`DESIGN.md`](DESIGN.md) for schema rationale, database choice, seeding strategy, and AI tooling notes
 * **Ruby version** — see `.ruby-version`
 * **How to run the test suite** — `bin/rails test` (and `bin/rails test:system` for system tests)
 * **Deployment** — see [Kamal](https://kamal-deploy.org/) config in `config/deploy.yml` and container build in `Dockerfile`
