@@ -2,6 +2,12 @@
 
 Rails 8 API and web application using **PostgreSQL** for data storage.
 
+## Live Links
+
+- Frontend: https://salary-management-frontend.vercel.app/
+- Backend API: https://salary-management-backend-fxer.onrender.com/api/v1/employees
+- Loom Demo: https://www.loom.com/share/1126c3fe3a7a42d485a8e55df9815807
+
 ## Requirements
 
 - Ruby (see [`.ruby-version`](.ruby-version))
