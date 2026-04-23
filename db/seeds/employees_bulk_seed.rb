@@ -40,11 +40,6 @@ module EmployeesBulkSeed
 
   class << self
     def call
-      if Rails.env.production?
-        warn "EmployeesBulkSeed: skipped (destructive bulk replace is disabled in production)."
-        return
-      end
-
       first_names, last_names = load_name_lists
       rng = build_rng
       now = Time.current
